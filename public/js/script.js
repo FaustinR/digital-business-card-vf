@@ -102,7 +102,6 @@ function getFormData() {
       }
     });
   
-    // addLineBreaks('display-role', 32);
     customizeDisplayRole('display-role');
   
     const vcard = 

@@ -250,7 +250,7 @@
   #download-qr-code {
     background-color:  #084063;
     float: right;
-    /* display: none; */
+    display: none;
     margin-top: 9px;
     margin-left: auto;
   }
