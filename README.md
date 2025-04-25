@@ -2,7 +2,7 @@
 
 # This applications allows you to create a business card as qr code after filling in your informations
 
-1.Clone the repository : git clone https://github.com/FaustinR/digital-business-card.git
+1.Clone the repository : git clone https://github.com/FaustinR/digital-business-card-v2.git
 cd digital-business-card
 npm install --save-dev express nodemon 
 
