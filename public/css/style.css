@@ -3,13 +3,13 @@
     margin: 0;
     padding: 0;
   }
-  body {
+  html, body {
     font-family: Arial, sans-serif;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px;
     background: #f4f4f4;
+    font-size: clamp(14px, 1.5vw, 18px); /* Responsive font size */
   }
   .container {
     display: flex;
@@ -33,6 +33,7 @@
     background-color: #e3e2de !important;
     padding: 20px;
     box-sizing: border-box;
+    margin-bottom: 1rem;
   }
 
   .preview-section {
@@ -43,14 +44,14 @@
   }
 
   /* Optional: Make them stack on smaller screens */
-    /* @media (max-width: 768px) {
+    @media (max-width: 768px) {
     .form-section, .preview-section {
         flex: 0 0 100%;
     }
-  } */
+  }
 
   .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 1rem;
   }
   label {
     display: block;
@@ -131,7 +132,9 @@
 
   #logo {
     display: block;
-    width: 8.8125vw;
+    width: 100%;
+    height: auto;
+    max-width: 100px;
   }
 
   .logo-and-infos {
@@ -171,12 +174,10 @@
   }
 
   .globe-section img{
-    width: 20rem; 
+    width: 15rem; 
     height: auto;
     border-bottom-right-radius: 15px;
     float: right;
-    /* margin-left: 1.25vw;
-    margin-top: 12.6vh; */
   }
 
   .summary p,
