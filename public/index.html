@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Worldgrid Business card</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/jpg" href="images/world_map_colored.png">
+
+  <!-- Styling -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/all.min.css" crossorigin="anonymous">
+  
+  <!-- Javascript -->
+  <script src="js/script.js" defer></script>
+
+  <script src="js/jszip.min.js"></script>
+  <script src="js/qrcode.min.js"></script>
+  <script src="js/FileSaver.min.js"></script>
+  <script src="js/html2canvas.min.js"></script>
+
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script> -->
+
+</head>
+<body>
+  <div class="container">
+    <div class="card p-4 shadow-sm form-section">
+      <h5 class="mb-3 text-primary">Fill out the form to generate your business card</h5>
+      <div id="notification" class="mb-3 notification"></div>
+      <form id="infoForm">
+        <div class="mb-3 form-group">
+          <label id="label-first-name" class="form-label add-red-star">First Name</label>
+          <input type="text" class="form-control" id="first-name" required placeholder="e.g : Jean" value="Olivier">
+        </div>
+        <div class="mb-3 form-group">
+          <label id="label-last-name" class="form-label add-red-star">Last Name</label>
+          <input type="text" class="form-control" id="last-name" required placeholder="e.g : Dupont" value="Villebrun">
+        </div>
+        <div class="mb-3 form-group">
+          <label class="form-label">Job title</label>
+          <input type="text" class="form-control" id="role" placeholder="e.g : Web developper" value="Business Developer Communication & Marketing Manager">
+        </div>
+        <div class="mb-3 form-group">
+          <label class="form-label">Phone number</label>
+          <input type="tel" class="form-control" id="phone" placeholder="ex : +33 7......" value="+33 6 00 00 00 00">
+        </div>
+        <div class="mb-3 form-group">
+          <label class="form-label add-red-star">Email</label>
+          <input type="email" class="form-control" id="email" placeholder="ex : dupontj@eviden.com" value="olivier.brun@eviden.com">
+        </div>
+        <div class="mb-3 form-group">
+          <label class="form-label">LinkedIn</label>
+          <a id="linkedIn" href="https://www.linkedin.com/company/worldgrid/posts/?feedView=all" target = "_blank">Worldgrid</a>
+        </div>
+        <div class="mb-3 form-group">
+          <label class="form-label">Website</label>
+          <a id="website" href="https://www.alten.com/alten-group/worldgrid/" target = "_blank">ALTEN</a>
+        </div>
+        <div class="mb-3 form-group">
+          <label class="form-label">Address</label>
+          <select id="address" name="address">
+            <option value="Aix" selected>Aix-en-provence</option>
+            <option value="Bezons">Bezons</option>
+            <option value="Echirolles" >Echirolles</option>
+          </select>
+        </div>
+        <div class="mb-3 form-group">
+          <label class="form-label">Country</label>
+          <select id="country" name="country">
+            <option value="France" value="default" selected>France</option>
+            <option value="Belgium">Belgium</option>
+            <option value="Germany">Germany</option>
+            <option value="Spain">Spain</option>
+            <option value="United Kingdom">United Kingdom</option>
+          </select>
+        </div>
+      </form>
+      <button id="bouton" type="submit" class="btn btn-success w-100" onclick="displayQrCode()">Generate the business card</button>
+    </div>
+    <div class="card p-4 shadow-sm preview-section summary" id="summary-infos">
+      <div id="preview" class="logo-and-infos">
+        <h3 id="display-names">Olivier Villebrun</h3>
+        <img id="logo" alt="company-logo" src = "images/new_logo_wg_alten.png">
+      </div>
+      <p id="display-role"></p>
+      <div class="qr-card">
+        <div id="qrcode"></div>
+      </div>
+      
+      <div class="wrapper">
+        <div class="personal-infos">
+          <p style="display: flex; align-items: center; gap: 5px;">
+            <i class="fas fa-at" style="color: white;"></i>
+            <span id="display-email"></span>
+          </p>
+          <p style="display: flex; align-items: center; gap: 5px;">
+            <i class="fas fa-phone" style="color: white;"></i>
+            <span id="display-phone"></span>
+          </p>
+          <p style="display: flex; gap: 5px;">
+            <i class="fas fa-location-dot" style="color: white; margin-top: 6px"></i>
+            <span id="display-adress"></span>
+          </p>
+          <p id="display-country" style="margin-left: 20px;"></p>
+        </div>
+        <div class="globe-section" id="globe-section">
+          <img id="globe" alt="Cropped" src="images/globe_quadrant_4.png">
+        </div>
+      </div>
+    </div>
+    <button id="download-qr-code" type="submit" class="btn btn-success w-35">Download my business card</button>
+  </div>
+</body>
+</html>
