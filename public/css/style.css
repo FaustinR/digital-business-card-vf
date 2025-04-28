@@ -254,6 +254,7 @@
     float: right;
     display: none;
     margin-left: auto;
+    margin-top: 0.5rem;
   }
 
   #summary-infos {
