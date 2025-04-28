@@ -9,6 +9,7 @@ const lastName = document.getElementById('last-name').value.trim();
 const inputs = ['first-name', 'last-name','role', 'phone', 'email', 'address', 'country'];
 
 
+//Liste des adresses des sites de Bezons, Aix et Echirolles
 const addresses = [
     {
       name : "Aix",
@@ -45,7 +46,7 @@ let qrCode;
 function generateQRCode(text) {
     // Create QR code
     const qrCode = document.getElementById('qrcode');
-    var qr = qrcode(0, 'L'); // 4 = QR code version, 'L' = low error correction
+    var qr = qrcode(0, 'L');
     qr.addData(text);
     qr.make();
 
@@ -118,15 +119,8 @@ function getFormData() {
   `ADR;TYPE=WORK:;;${data.street.replace(/<br\s*\/?>/gi, '')};${data.city.replace(/<br\s*\/?>/gi, '')};;${data.code.replace(/<br\s*\/?>/gi, '')};${data.country.replace(/<br\s*\/?>/gi, '')}\r\n` +
   `END:VCARD`;
 
-    emptyField = checkEmptyFields();
-    const notifClass = emptyField !== '' ? 'error' : 'success'
-    if(emptyField !== ''){
-      const message = `${emptyField} must be provided`;
-      notify(emptyField, notifClass, message);
-    }else{
-      generateQRCode(vcard);
-      vcardData = vcard;  
-    }
+    generateQRCode(vcard);
+    vcardData = vcard;  
   }
 
 
@@ -139,10 +133,8 @@ document.getElementById("download-qr-code").addEventListener("click", async () =
   
     const data = getFormData();
     
-    
-    const BOM = '\uFEFF';
-    const vcardBlob = new Blob([BOM + vcardData], { type: "text/vcard;charset=utf-8" });
-  
+    const vcardBlob = new Blob([vcardData], { type: "text/vcard;charset=utf-8" });
+
     // Capture canvas screenshot
     html2canvas(document.getElementById("summary-infos"), {
       useCORS: true,
@@ -192,7 +184,6 @@ function checkEmptyFields(){
         field = "Email address";
     }else if(data['first-name'] === '' && data['last-name'] === ''){
         field = "Email address";
-        console.log(data);
     }
     return field;
 }

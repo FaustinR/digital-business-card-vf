@@ -45,7 +45,6 @@
     box-sizing: border-box;
   }
 
-  /* Optional: Make them stack on smaller screens */
     @media (max-width: 768px) {
     .form-section, .preview-section {
         flex: 0 0 100%;
@@ -87,7 +86,6 @@
     }
   }
 
-  /* Styles from the previous version/latest version */
   .form-group{
     display: flex;
   }
@@ -153,7 +151,7 @@
 
   .qr-card {
     display: flex;
-    justify-content: center;  /* Horizontally center */
+    justify-content: center; 
   }
 
   #qrcode {
@@ -169,6 +167,7 @@
   .personal-infos {
     flex: 1;
     margin-top: 9vh;
+    font-size: clamp(1rem, 2.5vw, 1rem);
   }
 
   .globe-section {
@@ -218,7 +217,6 @@
       min-width: 200px;
     }
   }
-  /* End of the styles from the previous/latest version */
 
   .wrapper {
     display: flex;
@@ -228,16 +226,15 @@
   }
 
   .personal-infos {
-    /* flex: 1 1 60%; */
+    flex: 1 1 60%;
     min-width: 250px;
   }
   
   .globe-section {
-    /* flex: 1 1 40%; */
+    flex: 1 1 40%;
     min-width: 200px;
   }
 
-  /* Responsive tweak for small screens */
   @media (max-width: 768px) {
     .wrapper {
       flex-direction: column;
@@ -271,7 +268,7 @@
     object-fit: contain;
   }
 
-  /* Optional: Adjust for very small screens */
+
 @media (max-width: 480px) {
     #globe-section {
       width: 10%;
