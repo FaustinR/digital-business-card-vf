@@ -232,7 +232,8 @@ function displayQrCode(){
         notify(emptyField, notifClass, message);
     }else{
         let name = document.getElementById('first-name').value.trim()
-        message = `Dear ${name}, your business card has been created`
+
+        message = `Dear ${name}, your business card has been created successfully`
         notify(emptyField, 'success', message);
         document.getElementById('qrcode').style.display = "block";
         document.getElementById('download-qr-code').style.display = "block";
