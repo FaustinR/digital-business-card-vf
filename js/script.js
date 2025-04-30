@@ -175,10 +175,10 @@ document.getElementById("download-qr-code").addEventListener("click", async () =
 
       "ADR;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE;TYPE=WORK:;" +
       ";" + 
-      qpEncodeStr(data.street) + ";" + 
-      addCity + ";" +   
+      qpEncodeStr(data.street) + ";" +    
+      data.code.replace("<br>", "") + ";" +      
       ";;" + 
-      qpEncodeStr(sanitizeInput(data.code)) + ";" +   
+      addCity + ";" +
       "France",
     ];
     
