@@ -1,3 +1,5 @@
+//Déclaration des variables globales 
+
 const country = 'France'
 const companyName = "Worldgrid";
 const linkedin = document.getElementById("linkedIn").href;
@@ -31,7 +33,10 @@ const addresses = [
     }
 ]
 
-
+/**
+ * summaryMap Crée une liaison entre les champs du formulaire et les champs de la carte de visite, 
+ * summaryMap permet de mettre à jour les informations de la carte
+*/ 
 const summaryMap = {
     role: 'display-role',
     phone: 'display-phone',
@@ -72,8 +77,6 @@ function getFormData() {
     data.company = companyName;
     return data;
   }
-
-  var vcardData = "";
 
   function updateSummaryAndQRCode() {
     const firstName = document.getElementById('first-name').value.trim();
@@ -120,7 +123,6 @@ function getFormData() {
   `END:VCARD`;
 
     generateQRCode(vcard);
-    vcardData = vcard;  
   }
 
 
@@ -128,38 +130,91 @@ inputs.forEach(id => {
     document.getElementById(id).addEventListener('input', updateSummaryAndQRCode);
 });
 
+
 document.getElementById("download-qr-code").addEventListener("click", async () => {
     await document.fonts.ready;
   
     const data = getFormData();
-    
-    const vcardBlob = new Blob([vcardData], { type: "text/vcard;charset=utf-8" });
 
-    // Capture canvas screenshot
+    const qpEncodeStr = (str) => {
+      return Array.from(str)
+        .map(char => {
+          const code = char.charCodeAt(0);
+          if (
+            (code >= 33 && code <= 60 || code >= 62 && code <= 126) &&
+            char !== '='
+          ) {
+            return char;
+          } else {
+            return '=' + code.toString(16).toUpperCase().padStart(2, '0');
+          }
+        })
+        .join('');
+    };
+
+    const sanitizeInput = (str) => 
+      str
+      .replace(/[<br>\r\n]/g, '')
+      .replace(/[^!-<>@-~ ]/g, c =>
+        '=' + c.charCodeAt(0).toString(16).toUpperCase().padStart(2, '0')
+    );
+    
+    const addCity = data.city === 'Echirolles' ? qpEncodeStr(data.city) : qpEncodeStr(sanitizeInput(data.city))
+
+    const lines = [
+      "BEGIN:VCARD",
+      "VERSION:3.0",
+      "N;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:" + qpEncodeStr(data['last-name']) + ";" + qpEncodeStr(data['first-name']) + ";;;",
+      "FN;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:" + qpEncodeStr(`${data['first-name']} ${data['last-name']}`),
+      "ORG;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:" + qpEncodeStr(data.company),
+      "TITLE;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:" + qpEncodeStr(data.role),
+      "TEL;TYPE=CELL,VOICE:" + data.phone.replace(/\s+/g, ''),
+      "EMAIL:" + qpEncodeStr(data.email),
+      "URL:" + qpEncodeStr(website),
+      "URL:" + qpEncodeStr(linkedin),
+
+      "ADR;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE;TYPE=WORK:;" +
+      ";" + 
+      qpEncodeStr(data.street) + ";" + 
+      addCity + ";" +   
+      ";;" + 
+      qpEncodeStr(sanitizeInput(data.code)) + ";" +   
+      "France",
+    ];
+    
+    const vcardText = lines.join("\r\n") + "\r\n";
+  
+    const vcardBlob = new Blob([vcardText], {
+      type: "text/x-vcard;charset=utf-8"
+    });
+    
     html2canvas(document.getElementById("summary-infos"), {
       useCORS: true,
       scale: 2
     }).then(canvas => {
-      canvas.toBlob(async blob => {
+      canvas.toBlob(async qrBlob => {
         const zip = new JSZip();
-        zip.file("qr-code.png", blob);
+        zip.file("qr-code.png", qrBlob);
         zip.file("contact.vcf", vcardBlob);
   
         const content = await zip.generateAsync({ type: "blob" });
   
-        // Create a download link
         const a = document.createElement("a");
         a.href = URL.createObjectURL(content);
-        a.download = `${data['first-name']}_${data['last-name']}_business_card`;;
+        a.download = `${data['first-name']}_${data['last-name']}_business_card`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-      });
+      }, "image/png");
     });
-  });
-
+  });  
   
-
+  
+/**
+ * Cette fonction permet d'ajouter un saut de ligne lors de l'affichage du rôle dans la carte
+  * @param {id} - l'identifiant du champ input du formulaire 
+  * @returns rien
+*/
 function customizeDisplayRole(id) {
     const role = document.getElementById(id);
     if (role) {
@@ -173,6 +228,12 @@ function customizeDisplayRole(id) {
     }
   }
 
+
+/**
+ * Cette fonction permet de vérifier que le nom, le prénom et l'adresse sont renseignés 
+ * avant d'envoyer le formulaire et créer le QR Code.Si n'est pas le cas, une notification est 
+ * affiché pour informer l'utilisateur
+*/
 function checkEmptyFields(){
     let field = "";
     const data = getFormData();

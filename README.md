@@ -2,8 +2,6 @@
 
 # This applications allows you to create a business card as qr code after filling in your informations
 
-1.Clone the repository : git clone https://github.com/FaustinR/digital-business-card-v2.git
+1.Clone the repository : git clone https://github.com/FaustinR/digital-business-card-vf.git
 cd digital-business-card
-npm install --save-dev express nodemon 
-
-To launch the application : nodemon server.js(The application is opened on the port number : 3000)
+Access the main page by launching the index.html file in the root folder of the project
