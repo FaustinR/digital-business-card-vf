@@ -101,12 +101,24 @@ function getFormData() {
         document.getElementById('display-names').textContent = firstName || lastName ? `${firstName} ${lastName}` : ''
       }else if(id === 'address'){
         document.getElementById('display-adress').innerHTML = addressToDisplay;
+      }else if(id === 'phone'){
+        data[id].length > 3 ? document.getElementById('phone-section').style.display = 'block' : document.getElementById('phone-section').style.display = 'none';
+        //We get the last 9 digits of the phone number from the input field 
+        const lastDigits = data[id].slice(3).replace(/\D/g, "").slice(0, 9);
+        let formatted = "";
+        for (let i = 0; i < lastDigits.length; i++) {
+          formatted += lastDigits[i];
+          if (i === 0 || (i > 0 && (i - 1) % 2 === 1 && i !== lastDigits.length - 1)) {
+            formatted += ' ';
+          }
+        }
+        document.getElementById('display-phone').textContent = "+33 "+ formatted;
       }else{
         document.getElementById(summaryMap[id]).textContent = data[id];
       }
     });
   
-    customizeDisplayRole('display-role');
+    customizeJobTitle();
   
     const vcard = 
   `BEGIN:VCARD\r\n` +
@@ -211,25 +223,6 @@ document.getElementById("download-qr-code").addEventListener("click", async () =
   
   
 /**
- * Cette fonction permet d'ajouter un saut de ligne lors de l'affichage du rôle dans la carte
-  * @param {id} - l'identifiant du champ input du formulaire 
-  * @returns rien
-*/
-function customizeDisplayRole(id) {
-    const role = document.getElementById(id);
-    if (role) {
-      const content = role.textContent;
-  
-      // Add a line break after the first 20 characters
-      const newContent = content.length > 20
-        ? content.slice(0, 19) + '<br>' + content.slice(19)
-        : content;
-        role.innerHTML = newContent;
-    }
-  }
-
-
-/**
  * Cette fonction permet de vérifier que le nom, le prénom et l'adresse sont renseignés 
  * avant d'envoyer le formulaire et créer le QR Code.Si n'est pas le cas, une notification est 
  * affiché pour informer l'utilisateur
@@ -284,7 +277,6 @@ function getAddress(){
   }
   
 function displayQrCode(){
-    const data = getFormData();
     emptyField = checkEmptyFields();
     const notifClass = emptyField !== '' ? 'error' : 'success';
     let message;
@@ -301,7 +293,77 @@ function displayQrCode(){
     }
 }
 
-  
+/**
+ * Cette fonction permet d'ajouter un saut de ligne lors de l'affichage du rôle dans la carte
+  * @param {maxLength} - le nombre de caractères maximum pour ajout un saut de ligne 
+  * @returns rien
+*/
+
+function customizeJobTitle(maxLength = 20) {
+  const text = document.getElementById('role').value;
+  const breakChars = /[ ,&./\\]/;
+  let result = '';
+  let start = 0;
+
+  while (start < text.length) {
+    let end = start + maxLength;
+
+    if (end >= text.length) {
+      result += text.slice(start);
+      break;
+    }
+
+    let breakIndex = -1;
+    for (let i = end; i > start; i--) {
+      if (breakChars.test(text[i])) {
+        breakIndex = i + 1;
+        break;
+      }
+    }
+
+    if (breakIndex === -1) breakIndex = end;
+
+    result += text.slice(start, breakIndex).trim() + '<br>';
+    start = breakIndex;
+  }
+  document.getElementById('display-role').innerHTML = result;
+}
+
+
 window.onload = ()=>{
-    updateSummaryAndQRCode();
+  updateSummaryAndQRCode();
+  const phoneInput = document.getElementById('phone');
+  const prefix = '+33';
+
+  phoneInput.addEventListener('input', () => {
+    if (!phoneInput.value.startsWith(prefix)) {
+      phoneInput.value = prefix;
+    }
+  });
+
+  phoneInput.addEventListener('keydown', (e) => {
+    const cursorPosition = phoneInput.selectionStart;
+
+    // Prevent backspace or delete within the prefix
+    if (
+      (e.key === 'Backspace' && cursorPosition <= prefix.length) ||
+      (e.key === 'Delete' && cursorPosition < prefix.length)
+    ) {
+      e.preventDefault();
+    }
+  });
+
+  // Prevent selecting and overwriting the prefix
+  phoneInput.addEventListener('select', () => {
+    if (phoneInput.selectionStart < prefix.length) {
+      phoneInput.setSelectionRange(prefix.length, prefix.length);
+    }
+  });
+
+  // On focus, move cursor after the prefix if placed inside it
+  phoneInput.addEventListener('focus', () => {
+    if (phoneInput.selectionStart < prefix.length) {
+      phoneInput.setSelectionRange(prefix.length, prefix.length);
+    }
+  });
 }

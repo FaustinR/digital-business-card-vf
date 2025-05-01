@@ -275,3 +275,7 @@
       max-width: 50px;
     }
   }
+
+#phone-section {
+    display: none;
+}
