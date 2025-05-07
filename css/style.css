@@ -168,6 +168,7 @@
     flex: 1;
     margin-top: 9vh;
     font-size: clamp(1rem, 2.5vw, 1rem);
+    max-width: 800px;
   }
 
   .globe-section {
@@ -179,6 +180,12 @@
     height: auto;
     border-bottom-right-radius: 15px;
     float: right;
+  }
+
+  @media (max-width: 480px) {
+    .globe-section img{
+      width: 12rem; 
+    }
   }
 
   .summary p,
@@ -278,4 +285,10 @@
 
 #phone-section {
     display: none;
+}
+
+#display-adress {
+  font-size: clamp(14px, 2.5vw, 18px);
+  display: inline-block;
+  line-height: 1.5;
 }
