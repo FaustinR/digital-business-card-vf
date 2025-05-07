@@ -11,7 +11,11 @@ const lastName = document.getElementById('last-name').value.trim();
 const inputs = ['first-name', 'last-name','role', 'phone', 'email', 'address', 'country'];
 
 
-//Liste des adresses des sites de Bezons, Aix et Echirolles
+/**
+ * Liste des adresses des sites de Bezons, Aix et Echirolles 
+ * Utilisation des \n permet d'avoir des sauts de ligne lors de l'affichage dans la carte de visite
+ */
+
 const addresses = [
     {
       name : "Aix",
@@ -35,7 +39,7 @@ const addresses = [
 
 /**
  * summaryMap Crée une liaison entre les champs du formulaire et les champs de la carte de visite, 
- * summaryMap permet de mettre à jour les informations de la carte
+ * summaryMap permet de mettre à jour les informations de la carte en temps réel
 */ 
 const summaryMap = {
     role: 'display-role',
@@ -48,8 +52,8 @@ const summaryMap = {
 
 let qrCode;
 
+// Création du QR Code
 function generateQRCode(text) {
-    // Create QR code
     const qrCode = document.getElementById('qrcode');
     var qr = qrcode(0, 'L');
     qr.addData(text);
@@ -61,7 +65,10 @@ function generateQRCode(text) {
     qrCode.setAttribute('title', text);
 }
 
-
+/**
+ * Cette fonction permet de récupérer les valeurs renseignés par l'utilisateur.
+ * @returns rien
+ */
 function getFormData() {
     const data = {};
     inputs.forEach(id => {
@@ -77,6 +84,11 @@ function getFormData() {
     data.company = companyName;
     return data;
   }
+
+/**
+ * La fonction updateSummaryAndQRCode permet de mettre à jour les informations dans la carte de visite en temps réel.
+ * @returns rien
+ */
 
   function updateSummaryAndQRCode() {
     const firstName = document.getElementById('first-name').value.trim();
@@ -102,9 +114,10 @@ function getFormData() {
       }else if(id === 'address'){
         document.getElementById('display-adress').innerHTML = addressToDisplay;
       }else if(id === 'phone'){
-        // The phone logo on the business card appears only when the phone number is provided by the user
+        // On affiche l'icône(combiné d'un téléphone) seulement si le numéro de téléphone est renseigné
         data[id].length > 3 ? document.getElementById('phone-section').style.display = 'block' : document.getElementById('phone-section').style.display = 'none';
-        //We get the last 9 digits of the phone number from the input field and display them using the format 7 06 06 06 06
+        //On récupére les 9 derniers chiffres du numéro de téléphone et dans la carte de visite on les affiche au format +33 6 06 06 06 06
+        // Avec une éspace après tous les 2 chiffres
         const lastDigits = data[id].slice(3).replace(/\D/g, "").slice(0, 9);
         let formatted = "";
         for (let i = 0; i < lastDigits.length; i++) {
@@ -134,7 +147,8 @@ function getFormData() {
   `URL;TYPE=HOME:${linkedin}\r\n` +
   `ADR;TYPE=WORK:;;${data.street.replace(/<br\s*\/?>/gi, '')};${data.city.replace(/<br\s*\/?>/gi, '')};;${data.code.replace(/<br\s*\/?>/gi, '')};${data.country.replace(/<br\s*\/?>/gi, '')}\r\n` +
   `END:VCARD`;
-
+    
+    formatAddress();
     generateQRCode(vcard);
   }
 
@@ -143,6 +157,11 @@ inputs.forEach(id => {
     document.getElementById(id).addEventListener('input', updateSummaryAndQRCode);
 });
 
+
+/**
+ * Lorsque l'utilisateur clique sur le bouton Download my business car,La carte de visite est téléchargé sous format png et 
+ * le fichier .vcf et les deux ont sauvegardé dans un dossier zip sous le nom prenom_nom_business_card.zip
+*/
 
 document.getElementById("download-qr-code").addEventListener("click", async () => {
     await document.fonts.ready;
@@ -174,6 +193,7 @@ document.getElementById("download-qr-code").addEventListener("click", async () =
     
     const addCity = data.city === 'Echirolles' ? qpEncodeStr(data.city) : qpEncodeStr(sanitizeInput(data.city))
 
+    //Création du contenu du fichier contact.vcf
     const lines = [
       "BEGIN:VCARD",
       "VERSION:3.0",
@@ -227,6 +247,7 @@ document.getElementById("download-qr-code").addEventListener("click", async () =
  * Cette fonction permet de vérifier que le nom, le prénom et l'adresse sont renseignés 
  * avant d'envoyer le formulaire et créer le QR Code.Si n'est pas le cas, une notification est 
  * affiché pour informer l'utilisateur
+ * @returns {field} Le nom du vide
 */
 function checkEmptyFields(){
     let field = "";
@@ -242,7 +263,14 @@ function checkEmptyFields(){
     }
     return field;
 }
-  
+
+/**
+ * Cette fonction gère les notifications en cas d'erreur (champs obligatoire non renseigné par ex) et la création avec succès du business card 
+  * @param {emptyField} - Le nom du champ (ex : first-name, last-name, email, ou vide si tous les champs sont renseignés) 
+  * @param {fieldClass} - Le type de notification à afficher (erreur ou succès)
+  * @param {message} - Le message customizé à afficher pour l'utilisateur
+  * @returns rien
+*/
 function notify(emptyField, fieldClass, message){
     let notification = document.getElementById('notification');
     if(emptyField !== ''){
@@ -261,6 +289,11 @@ function notify(emptyField, fieldClass, message){
     }, 5000);
 }
 
+/**
+ * Cette fonction de récupèrer l'adresse copmlète au format JSON en fonction de nom du site choisi dans la liste déroulante 
+ * contenant les sites(Aix-en-provence, Bezons et Echirolles)
+* @returns {addressJson} Un objet JSON contenant la rue, la ville et le code postal du site séléctionné
+*/
 function getAddress(){
     const addressName = document.getElementById('address').value.trim();
     const address = addresses.find(add => add.name === addressName)
@@ -330,26 +363,25 @@ function customizeJobTitle(maxLength = 21) {
   document.getElementById('display-role').innerHTML = result;
 }
 
+/**
+  * Cette fonction permet d'ajouter un saut de ligne lors de l'affichage de l'adresse dans la carte de visite
+  * Si il s'agit un petit écran (Sur un téléphone mobile par ex), cette fonction ajoute des sauts de lignes 
+  * pour mieux afficher l'adresse 
+  * @returns rien
+*/
 function formatAddress() {
   const addressField = document.getElementById("display-adress");
   let address = addressField.innerHTML;
-
-  // Normalize line breaks for processing
   let lines = address.split(/<br\s*\/?>/gi).map(line => line.trim());
   if (window.innerWidth <= 480) {
-    // Small screen: add line break before Cedex if found
     lines = lines.map(line => {
       return line.includes("Cedex") ? line.replace(/(.*)(\sCedex\s?\d*)/, "$1<br>$2") : line;
     });
   } else {
-    // Larger screen: keep original structure without added <br> before Cedex
     lines = lines.map(line => line.replace(/<br\s*\/?>/gi, '').trim());
   }
-  // Rebuild the address string
   addressField.innerHTML = lines.join("<br>");
 }
-
-document.getElementById("address").addEventListener("change", formatAddress);
 
 window.onload = ()=>{
   updateSummaryAndQRCode();
@@ -366,8 +398,6 @@ window.onload = ()=>{
 
   phoneInput.addEventListener('keydown', (e) => {
     const cursorPosition = phoneInput.selectionStart;
-
-    // Prevent backspace or delete within the prefix
     if (
       (e.key === 'Backspace' && cursorPosition <= prefix.length) ||
       (e.key === 'Delete' && cursorPosition < prefix.length)
@@ -375,15 +405,11 @@ window.onload = ()=>{
       e.preventDefault();
     }
   });
-
-  // Prevent selecting and overwriting the prefix
   phoneInput.addEventListener('select', () => {
     if (phoneInput.selectionStart < prefix.length) {
       phoneInput.setSelectionRange(prefix.length, prefix.length);
     }
   });
-
-  // On focus, move cursor after the prefix if placed inside it
   phoneInput.addEventListener('focus', () => {
     if (phoneInput.selectionStart < prefix.length) {
       phoneInput.setSelectionRange(prefix.length, prefix.length);
