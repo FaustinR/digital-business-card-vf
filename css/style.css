@@ -292,3 +292,15 @@
   display: inline-block;
   line-height: 1.5;
 }
+
+#email-error {
+  color: red;
+  font-size: 14px;
+  display: none;
+}
+
+.input-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
