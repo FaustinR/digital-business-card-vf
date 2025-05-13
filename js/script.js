@@ -8,7 +8,9 @@ const email = document.getElementById('email').value.trim();
 const summaryInfos = document.getElementById('summary-infos');
 const firstName = document.getElementById('first-name').value.trim();
 const lastName = document.getElementById('last-name').value.trim();
-const inputs = ['first-name', 'last-name','role', 'phone', 'email', 'address', 'country'];
+var inputs = ['first-name', 'last-name','role', 'phone', 'email', 'address', 'country'];
+const newInputs = ['custom-street', 'custom-code', 'custom-city'];
+var otherAddress = false;
 
 
 /**
@@ -65,17 +67,26 @@ function generateQRCode(text) {
     qrCode.setAttribute('title', text);
 }
 
+
 /**
  * Cette fonction permet de récupérer les valeurs renseignés par l'utilisateur.
  * @returns rien
  */
+
 function getFormData() {
+    otherAddress = true ? document.getElementById('address').value === 'Other' : false;
+
+    if(otherAddress){
+      inputs = [...new Set([...inputs, ...newInputs])];
+    }
+
     const data = {};
     inputs.forEach(id => {
       data[id] = document.getElementById(id).value.trim();
     });
     
     const address = getAddress();
+    
     data.street = address.street;
     data.code = address.code;
     data.city = address.city
@@ -85,7 +96,7 @@ function getFormData() {
     return data;
   }
 
-/**
+ /**
  * La fonction updateSummaryAndQRCode permet de mettre à jour les informations dans la carte de visite en temps réel.
  * @returns rien
  */
@@ -93,15 +104,10 @@ function getFormData() {
   function updateSummaryAndQRCode() {
     const firstName = document.getElementById('first-name').value.trim();
     const lastName = document.getElementById('last-name').value.trim();
-    
+
+    customAddress();
     const data = getFormData();
-  
-    const address = getAddress();
-  
-    data.street = address.street;
-    data.code = address.code;
-    data.city = address.city
-  
+
     const addressToDisplay = [
       data.street,
       data.code,
@@ -128,12 +134,19 @@ function getFormData() {
         }
         document.getElementById('display-phone').textContent = "+33 "+ formatted;
       }else{
-        document.getElementById(summaryMap[id]).textContent = data[id];
+          try {
+            if(!newInputs.includes(id)){
+              document.getElementById(summaryMap[id]).textContent = data[id];
+            }
+
+          } catch (error) {
+            console.error("An error occurred with the id :", id);
+          }
       }
     });
   
     customizeJobTitle();
-  
+    const phoneNber = data.phone.length >= 10 ? data.phone : '';
     const vcard = 
   `BEGIN:VCARD\r\n` +
   `VERSION:3.0\r\n` +
@@ -141,18 +154,18 @@ function getFormData() {
   `FN:${data['first-name']} ${data['last-name']}\r\n` +
   `ORG:${data.company}\r\n` +
   `TITLE:${data.role}\r\n` +
-  `TEL;TYPE=CELL:${data.phone}\r\n` +
+  `TEL;TYPE=CELL:${phoneNber}\r\n` +
   `EMAIL:${data.email}\r\n` +
   `URL;TYPE=WORK:${website}\r\n` +
   `URL;TYPE=HOME:${linkedin}\r\n` +
   `ADR;TYPE=WORK:;;${data.street.replace(/<br\s*\/?>/gi, '')};${data.city.replace(/<br\s*\/?>/gi, '')};;${data.code.replace(/<br\s*\/?>/gi, '')};${data.country.replace(/<br\s*\/?>/gi, '')}\r\n` +
   `END:VCARD`;
-    
+
     formatAddress();
 
     const stringInputs = [document.getElementById("first-name"), document.getElementById("last-name")];
     stringInputs.forEach(allowOnlyLetters);
-
+  
     generateQRCode(vcard);
   }
 
@@ -162,11 +175,19 @@ inputs.forEach(id => {
 });
 
 
-/**
+function customAddress(){
+  document.getElementById('display-adress').innerHTML = document.getElementById('custom-street').value + '<br>' + document.getElementById('custom-code').value +'<br>' +
+  document.getElementById('custom-city').value;
+}
+
+newInputs.forEach(id => {
+    document.getElementById(id).addEventListener('input', updateSummaryAndQRCode);
+});
+
+ /**
  * Lorsque l'utilisateur clique sur le bouton Download my business car,La carte de visite est téléchargé sous format png et 
  * le fichier .vcf et les deux ont sauvegardé dans un dossier zip sous le nom prenom_nom_business_card.zip
-*/
-
+ */
 document.getElementById("download-qr-code").addEventListener("click", async () => {
     await document.fonts.ready;
   
@@ -195,8 +216,9 @@ document.getElementById("download-qr-code").addEventListener("click", async () =
         '=' + c.charCodeAt(0).toString(16).toUpperCase().padStart(2, '0')
     );
     
-    const addCity = data.city === 'Echirolles' ? qpEncodeStr(data.city) : qpEncodeStr(sanitizeInput(data.city))
+    const addCity = data.city === 'Echirolles' || otherAddress ? qpEncodeStr(data.city) : qpEncodeStr(sanitizeInput(data.city))
 
+    const phoneNber = data.phone.length >= 10 ? data.phone : '';
     //Création du contenu du fichier contact.vcf
     const lines = [
       "BEGIN:VCARD",
@@ -205,14 +227,14 @@ document.getElementById("download-qr-code").addEventListener("click", async () =
       "FN;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:" + qpEncodeStr(`${data['first-name']} ${data['last-name']}`),
       "ORG;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:" + qpEncodeStr(data.company),
       "TITLE;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:" + qpEncodeStr(data.role),
-      "TEL;TYPE=CELL,VOICE:" + data.phone.replace(/\s+/g, ''),
+      "TEL;TYPE=CELL,VOICE:" + phoneNber,
       "EMAIL:" + qpEncodeStr(data.email),
       "URL:" + qpEncodeStr(website),
       "URL:" + qpEncodeStr(linkedin),
 
       "ADR;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE;TYPE=WORK:;" +
       ";" + 
-      qpEncodeStr(data.street) + ";" +    
+      qpEncodeStr(data.street.replace("<br>", "")) + ";" +    
       data.code.replace("<br>", "") + ";" +      
       ";;" + 
       addCity + ";" +
@@ -246,7 +268,7 @@ document.getElementById("download-qr-code").addEventListener("click", async () =
     });
   });  
   
-  
+
 /**
  * Cette fonction permet de vérifier que le nom, le prénom et l'adresse sont renseignés 
  * avant d'envoyer le formulaire et créer le QR Code.Si n'est pas le cas, une notification est 
@@ -298,18 +320,30 @@ function notify(emptyField, fieldClass, message){
  * contenant les sites(Aix-en-provence, Bezons et Echirolles)
 * @returns {addressJson} Un objet JSON contenant la rue, la ville et le code postal du site séléctionné
 */
+
 function getAddress(){
     const addressName = document.getElementById('address').value.trim();
+
     const address = addresses.find(add => add.name === addressName)
-    const addressJson = {}
-  
-    addressJson.street = address.street.replace(/\n/g, '<br>');
-    if(addressName !== 'Echirolles'){
-      addressJson.code = address.PostalCode.replace(/\n/g, '<br>');
-      addressJson.city = address.city.replace(/\n/g, '<br>')
+
+    let addressJson = {}
+    otherAddress = true ? document.getElementById('address').value === 'Other' : false;
+    if(otherAddress){
+      document.getElementById('custom-address').style.display = 'block';
+      addressJson.street = document.getElementById('custom-street').value.trim() + '<br>';
+      addressJson.code = document.getElementById('custom-code').value.trim() + '<br>';
+      addressJson.city = document.getElementById('custom-city').value.trim();
+      return addressJson
     }else{
-      addressJson.code = address.PostalCode.replace(/\n/g, '<br>');
-      addressJson.city = address.city;
+      if(addressName !== 'Echirolles' && !otherAddress){
+        addressJson.street = address.street.replace(/\n/g, '<br>');
+        addressJson.code = address.PostalCode.replace(/\n/g, '<br>');
+        addressJson.city = address.city.replace(/\n/g, '<br>')
+      }else{
+        addressJson.street = address.street.replace(/\n/g, '<br>');
+        addressJson.code = address.PostalCode.replace(/\n/g, '<br>');
+        addressJson.city = address.city;
+      }
     }
     return addressJson
   }
@@ -374,6 +408,7 @@ function customizeJobTitle(maxLength = 21) {
   document.getElementById('display-role').innerHTML = result;
 }
 
+
 /**
   * Cette fonction permet d'ajouter un saut de ligne lors de l'affichage de l'adresse dans la carte de visite
   * Si il s'agit un petit écran (Sur un téléphone mobile par ex), cette fonction ajoute des sauts de lignes 
@@ -396,19 +431,28 @@ function formatAddress() {
 
 function allowOnlyLetters(input) {
   input.addEventListener("input", () => {
-    input.value = input.value.replace(/[^a-zA-Z\s]/g, ""); // On enlève tous les chiffres qu'il y a dans les inputs (Nom et prénom)
+    input.value = input.value.replace(/[^a-zA-ZÀ-ÿ\s]/g, ""); // On enlève tous les chiffres qu'il y a dans les inputs (Nom et prénom)
   });
 }
 
-
+/**
+  * Cette fonction permet d'assurer le bon format de l'adresse mail 
+  * @returns un booléen vrai si le format de l'adresse mail est correcte et faux si ce n'est pas le cas
+*/
 function isValidEmail(email) {
   const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return pattern.test(email);
 }
 
+document.getElementById("address").addEventListener("change", function () {
+  const selectedAddress = this.value;
+  var customAddSection = document.getElementById('custom-address');
+  selectedAddress === 'Other' ? customAddSection.style.display = 'block' : customAddSection.style.display = 'none';
+})
+
 window.onload = ()=>{
   updateSummaryAndQRCode();
-  formatAddress();
+  getFormData();
 
   const emailInput = document.getElementById("email");
   const errorSpan = document.getElementById("email-error");
@@ -425,6 +469,7 @@ window.onload = ()=>{
   }, 5000);
 
   });
+
 
   const phoneInput = document.getElementById('phone');
   const prefix = '+33';
@@ -461,4 +506,5 @@ window.onload = ()=>{
 
   window.addEventListener("DOMContentLoaded", formatAddress);
   window.addEventListener("resize", formatAddress);
+
 }
