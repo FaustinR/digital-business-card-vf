@@ -334,6 +334,7 @@ function notify(emptyField, fieldClass, message){
     notification.style.display = "block";
     setTimeout(function() {
         notification.style.display = "none";
+        document.getElementsByClassName('form-section')[0].style.height = "fit-content"
     }, 5000);
 }
 

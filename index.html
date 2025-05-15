@@ -23,43 +23,43 @@
 </head>
 <body>
   <div class="container">
-    <div class="card p-4 shadow-sm form-section">
-      <h5 class="mb-3 text-primary">Fill out the form to generate your business card</h5>
-      <div id="notification" class="mb-3 notification"></div>
+    <div class="card shadow-sm form-section">
+      <h5 class="text-primary">Fill out the form to generate your business card</h5>
+      <div id="notification" class="mb-2 notification"></div>
       <form id="infoForm">
-        <div class="mb-3 form-group">
+        <div class="form-group">
           <label id="label-first-name" class="form-label add-red-star">First Name</label>
           <input type="text" class="form-control" id="first-name" required placeholder="e.g : Jean">
         </div>
-        <div class="mb-3 form-group">
+        <div class="form-group">
           <label id="label-last-name" class="form-label add-red-star">Last Name</label>
           <input type="text" class="form-control" id="last-name" required placeholder="e.g : Dupont" >
         </div>
-        <div class="mb-3 form-group">
+        <div class="form-group">
           <label class="form-label">Job title</label>
           <input type="text" class="form-control" id="role" placeholder="e.g : Web developper">
         </div>
-        <div class="mb-3 form-group">
+        <div class="form-group">
           <label class="form-label">Phone number</label>
           <input type="text" class="form-control" id="phone" placeholder="ex : +33 7......" style="height: fit-content;" pattern="\d{9}" 
             maxlength="12" inputmode="numeric" value="+33">
         </div>
-        <div class="mb-3 form-group">
+        <div class="form-group">
           <label class="form-label add-red-star">Email</label>
           <div class="input-wrapper">
             <input type="email" class="form-control" id="email" placeholder="ex : dupontj@eviden.com">
             <span id="email-error">Please enter a valid email address.</span>
           </div>
         </div>
-        <div class="mb-3 form-group">
+        <div class="form-group">
           <label class="form-label">LinkedIn</label>
           <a id="linkedIn" href="https://www.linkedin.com/company/worldgrid/posts/?feedView=all" target = "_blank">Worldgrid</a>
         </div>
-        <div class="mb-3 form-group">
+        <div class="form-group">
           <label class="form-label">Website</label>
           <a id="website" href="https://www.alten.com/alten-group/worldgrid/" target = "_blank">ALTEN</a>
         </div>
-        <div class="mb-3 form-group">
+        <div class="form-group">
           <label class="form-label">Address</label>
           <select id="address" name="address" aria-label="address">
             <option value="Aix" selected>Aix-en-provence</option>
@@ -69,24 +69,24 @@
           </select>
         </div>
         <div id="custom-address">
-          <div class="mb-3 form-group">
+          <div class="form-group">
             <label class="form-label add-red-star">Street Number and Name</label>
             <input type="text" class="form-control" id="custom-street"  placeholder="e.g : 33 rue Thiers">
           </div>
-          <div class="mb-3 form-group">
+          <div class="form-group">
             <label class="form-label">Additional Address Information</label>
             <input type="text" class="form-control" id="additional-street">
           </div>
-          <div class="mb-3 form-group">
+          <div class="form-group">
             <label class="form-label add-red-star">Postal Code and City</label>
             <input type="text" class="form-control" id="custom-code" placeholder="e.g : 38300" >
           </div>
-          <div class="mb-3 form-group">
+          <div class="form-group">
             <label class="form-label">Additional Address Information</label>
             <input type="text" class="form-control" id="custom-city">
           </div>
         </div>
-        <div class="mb-3 form-group">
+        <div class="form-group">
           <label class="form-label">Country</label>
           <select id="country" name="country" aria-label="country">
             <option value="France" value="default" selected>France</option>
@@ -101,38 +101,42 @@
       </form>
       <button id="bouton" type="submit" class="btn btn-success w-100" onclick="displayQrCode()">Generate the business card</button>
     </div>
-    <div class="card p-4 shadow-sm preview-section summary" id="summary-infos">
-      <div id="preview" class="logo-and-infos">
-        <h3 id="display-names"></h3>
-        <img id="logo" alt="company-logo" src = "images/new_logo_wg_alten.png">
-      </div>
-      <p id="display-role"></p>
-      <div class="qr-card">
-        <div id="qrcode"></div>
-      </div>
-      
-      <div class="wrapper">
-        <div class="personal-infos">
-          <p style="display: flex; align-items: center; gap: 5px;">
-            <i class="fas fa-at" style="color: white;"></i>
-            <span id="display-email"></span>
-          </p>
-          <p id="phone-section" style="align-items: center; gap: 5px;">
-            <i class="fas fa-phone" style="color: white;"></i>
-            <span id="display-phone"></span>
-          </p>
-          <p style="display: flex; gap: 5px;">
-            <i class="fas fa-location-dot" style="color: white; margin-top: 6px"></i>
-            <span id="display-adress"></span>
-          </p>
-          <p id="display-country" style="margin-left: 20px;"></p>
+    <div id="right-box">
+      <div class="card shadow-sm preview-section summary" id="summary-infos">
+        <div id="preview" class="logo-and-infos">
+          <h3 id="display-names"></h3>
+          <img id="logo" alt="company-logo" src = "images/new_logo_wg_alten.png">
         </div>
-        <div class="globe-section" id="globe-section">
-          <img id="globe" alt="Cropped" src="images/globe_quadrant_4.png">
+        <p id="display-role"></p>
+        <div class="qr-card">
+          <div id="qrcode"></div>
         </div>
+        
+        <div class="wrapper">
+          <div class="personal-infos">
+            <p style="display: flex; align-items: center; gap: 5px;">
+              <i class="fas fa-at" style="color: white;"></i>
+              <span id="display-email"></span>
+            </p>
+            <p id="phone-section" style="align-items: center; gap: 5px;">
+              <i class="fas fa-phone" style="color: white;"></i>
+              <span id="display-phone"></span>
+            </p>
+            <p style="display: flex; gap: 5px;">
+              <i class="fas fa-location-dot" style="color: white; margin-top: 6px"></i>
+              <span id="display-adress"></span>
+            </p>
+            <p id="display-country" style="margin-left: 20px;"></p>
+          </div>
+          <div class="globe-section" id="globe-section">
+            <img id="globe" alt="Cropped" src="images/globe_quadrant_4.png">
+          </div>
+        </div>
+      </div>
+      <div>
+        <button id="download-qr-code" type="submit" class="btn btn-success w-35">Download my business card</button>
       </div>
     </div>
-    <button id="download-qr-code" type="submit" class="btn btn-success w-35">Download my business card</button>
   </div>
 </body>
 </html>

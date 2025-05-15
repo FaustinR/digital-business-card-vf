@@ -23,6 +23,7 @@
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     padding: 20px;
     width: -webkit-fill-available;
+    height: -webkit-fill-available;
   }
   .form-section, .preview-section {
     flex: 1;
@@ -156,19 +157,22 @@
 
   #qrcode {
     display: none;
-    width: 12.5rem;
-    height: 12.5rem;
+    width: 10.5rem;
+    height: 10.5rem;
     border: 3px solid white;
     border-radius: 5px;
-    margin-top: 7vh;
+    margin-top: 2vh;
   }
 
 
   .personal-infos {
     flex: 1;
-    margin-top: 9vh;
+    margin-top: 2vh;
     font-size: clamp(1rem, 2.5vw, 1rem);
     max-width: 800px;
+    .summary p{
+          margin-bottom: 1px;
+    }
   }
 
   .globe-section {
@@ -223,6 +227,7 @@
     flex-wrap: wrap;
     gap: 20px;
     align-items: flex-start;
+    margin-top: 1rem;
   }
 
   .personal-infos {
@@ -314,4 +319,21 @@
 
 #other-country {
   display: none;
+}
+
+.form-group {
+  margin-bottom: 0.7rem;
+}
+
+#right-box {
+  width: 50%;
+  height: auto; /* Default height behavior */
+}
+
+/* Make it full width on smaller screens */
+@media (max-width: 600px) {
+  #right-box {
+    width: 100%;
+    height: fit-content;
+  }
 }
