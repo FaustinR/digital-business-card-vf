@@ -1,6 +1,6 @@
 //Déclaration des variables globales 
 
-const country = 'France'
+var country = 'France';
 const companyName = "Worldgrid";
 const linkedin = document.getElementById("linkedIn").href;
 const website = document.getElementById("website").href;
@@ -9,8 +9,9 @@ const summaryInfos = document.getElementById('summary-infos');
 const firstName = document.getElementById('first-name').value.trim();
 const lastName = document.getElementById('last-name').value.trim();
 var inputs = ['first-name', 'last-name','role', 'phone', 'email', 'address', 'country'];
-const newInputs = ['custom-street', 'custom-code', 'custom-city'];
+const newInputs = ['custom-street', 'additional-street', 'custom-code', 'custom-city'];
 var otherAddress = false;
+var otherCountry = false;
 
 
 /**
@@ -78,6 +79,14 @@ function getFormData() {
 
     if(otherAddress){
       inputs = [...new Set([...inputs, ...newInputs])];
+    }else{
+      inputs = inputs.filter(item => !newInputs.includes(item));
+    }
+
+    if(otherCountry){
+      inputs = [...new Set([...inputs, ...['other-country']])];
+    }else{
+      inputs = inputs.filter(item => item !== 'other-country');
     }
 
     const data = {};
@@ -88,10 +97,10 @@ function getFormData() {
     const address = getAddress();
     
     data.street = address.street;
+    data.addStreet = data['additional-street'];
     data.code = address.code;
     data.city = address.city
-  
-    data.country = country;
+    data.country = !otherCountry ? getCountry() : document.getElementById('other-country').value.trim();
     data.company = companyName;
     return data;
   }
@@ -104,21 +113,29 @@ function getFormData() {
   function updateSummaryAndQRCode() {
     const firstName = document.getElementById('first-name').value.trim();
     const lastName = document.getElementById('last-name').value.trim();
+    otherCountry = true ? document.getElementById('country').value === 'Other' : false;
+    otherAddress = true ? document.getElementById('address').value === 'Other' : false;
 
-    customAddress();
+    if(!otherAddress){
+      document.getElementById('country').value = 'France';
+    }
+
     const data = getFormData();
-
+    displayNewCountry();
     const addressToDisplay = [
       data.street,
+      otherAddress ? data.addStreet+ '<br>' : '',
       data.code,
       data.city
-    ].join('\n');
-  
+    ].filter(str => str !== "").join('\n');
+    
     inputs.forEach(id => {
       if(['first-name', 'last-name'].includes(id)){
         document.getElementById('display-names').textContent = firstName || lastName ? `${firstName.replace(/[0-9]/g, '')} ${lastName.replace(/[0-9]/g, '')}` : ''
       }else if(id === 'address'){
         document.getElementById('display-adress').innerHTML = addressToDisplay;
+      }else if(id === 'other-country'){
+        document.getElementById('display-country').textContent = document.getElementById(id).value.trim();
       }else if(id === 'phone'){
         // On affiche l'icône(combiné d'un téléphone) seulement si le numéro de téléphone est renseigné
         data[id].length > 3 ? document.getElementById('phone-section').style.display = 'block' : document.getElementById('phone-section').style.display = 'none';
@@ -144,7 +161,14 @@ function getFormData() {
           }
       }
     });
-  
+    
+    let address = '';
+    if(otherAddress){
+      address = `ADR;TYPE=WORK:;${data.addStreet.replace(/<br\s*\/?>/gi, '')};${data.street.replace(/<br\s*\/?>/gi, '')};${data.city.replace(/<br\s*\/?>/gi, '')};;${data.code.replace(/<br\s*\/?>/gi, '')};${data.country.replace(/<br\s*\/?>/gi, '')}\r\n`
+    }else{
+      address = `ADR;TYPE=WORK:;;${data.street.replace(/<br\s*\/?>/gi, '')};${data.city.replace(/<br\s*\/?>/gi, '')};;${data.code.replace(/<br\s*\/?>/gi, '')};${data.country.replace(/<br\s*\/?>/gi, '')}\r\n`
+    }
+    
     customizeJobTitle();
     const phoneNber = data.phone.length >= 10 ? data.phone : '';
     const vcard = 
@@ -158,11 +182,10 @@ function getFormData() {
   `EMAIL:${data.email}\r\n` +
   `URL;TYPE=WORK:${website}\r\n` +
   `URL;TYPE=HOME:${linkedin}\r\n` +
-  `ADR;TYPE=WORK:;;${data.street.replace(/<br\s*\/?>/gi, '')};${data.city.replace(/<br\s*\/?>/gi, '')};;${data.code.replace(/<br\s*\/?>/gi, '')};${data.country.replace(/<br\s*\/?>/gi, '')}\r\n` +
+  address +
   `END:VCARD`;
 
     formatAddress();
-
     const stringInputs = [document.getElementById("first-name"), document.getElementById("last-name")];
     stringInputs.forEach(allowOnlyLetters);
   
@@ -174,15 +197,14 @@ inputs.forEach(id => {
     document.getElementById(id).addEventListener('input', updateSummaryAndQRCode);
 });
 
-
-function customAddress(){
-  document.getElementById('display-adress').innerHTML = document.getElementById('custom-street').value + '<br>' + document.getElementById('custom-code').value +'<br>' +
-  document.getElementById('custom-city').value;
-}
-
 newInputs.forEach(id => {
     document.getElementById(id).addEventListener('input', updateSummaryAndQRCode);
 });
+
+['other-country', 'country'].forEach(id => {
+    document.getElementById(id).addEventListener('input', updateSummaryAndQRCode);
+});
+
 
  /**
  * Lorsque l'utilisateur clique sur le bouton Download my business car,La carte de visite est téléchargé sous format png et 
@@ -330,8 +352,11 @@ function getAddress(){
     otherAddress = true ? document.getElementById('address').value === 'Other' : false;
     if(otherAddress){
       document.getElementById('custom-address').style.display = 'block';
-      addressJson.street = document.getElementById('custom-street').value.trim() + '<br>';
-      addressJson.code = document.getElementById('custom-code').value.trim() + '<br>';
+      addressJson.street = document.getElementById('custom-street').value.trim() + '<br>'; // Contains the name and the street number
+      addressJson.addStreet = '<br>'+ document.getElementById('additional-street').value.trim() + '<br>';
+      // add the additional street infos with the id=additional-street if not empty
+      addressJson.code = document.getElementById('custom-code').value.trim() + '<br>'; //Contains the postal code and the city 
+      // add the additional city infos with the id=custom-city if not empty
       addressJson.city = document.getElementById('custom-city').value.trim();
       return addressJson
     }else{
@@ -448,7 +473,35 @@ document.getElementById("address").addEventListener("change", function () {
   const selectedAddress = this.value;
   var customAddSection = document.getElementById('custom-address');
   selectedAddress === 'Other' ? customAddSection.style.display = 'block' : customAddSection.style.display = 'none';
+  if(selectedAddress !== 'Other'){
+    document.getElementById('display-country').textContent = 'France';
+  }
 })
+
+function displayNewCountry() {
+  const name = getCountry();
+  if(name === 'Other'){
+    document.getElementById("country").style.width = '40%';
+    document.getElementById("country").style.marginLeft = '2.5rem';
+    document.getElementById("country").style.marginRight = '1rem';
+    document.getElementById("other-country").style.display = 'block';
+    document.getElementById('display-country').textContent = '';
+    otherCountry = true;
+    chosenCountry = document.getElementById('country').value.trim();
+  }else{
+    document.getElementById('display-country').textContent = country;
+    document.getElementById("other-country").style.display = 'none';
+    document.getElementById("country").style.width = '100%';
+    document.getElementById("country").style.marginLeft = '0rem';
+    document.getElementById("country").style.marginRight = '0rem';
+  }
+}
+
+function getCountry() {
+  const selectElement = document.getElementById("country");
+  return selectElement.value;
+}
+
 
 window.onload = ()=>{
   updateSummaryAndQRCode();

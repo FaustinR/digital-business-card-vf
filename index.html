@@ -61,7 +61,7 @@
         </div>
         <div class="mb-3 form-group">
           <label class="form-label">Address</label>
-          <select id="address" name="address">
+          <select id="address" name="address" aria-label="address">
             <option value="Aix" selected>Aix-en-provence</option>
             <option value="Bezons">Bezons</option>
             <option value="Echirolles" >Echirolles</option>
@@ -74,23 +74,29 @@
             <input type="text" class="form-control" id="custom-street"  placeholder="e.g : 33 rue Thiers">
           </div>
           <div class="mb-3 form-group">
+            <label class="form-label">Additional Address Information</label>
+            <input type="text" class="form-control" id="additional-street">
+          </div>
+          <div class="mb-3 form-group">
             <label class="form-label add-red-star">Postal Code and City</label>
             <input type="text" class="form-control" id="custom-code" placeholder="e.g : 38300" >
           </div>
           <div class="mb-3 form-group">
             <label class="form-label">Additional Address Information</label>
-            <input type="text" class="form-control" id="custom-city" placeholder="e.g : Grenoble">
+            <input type="text" class="form-control" id="custom-city">
           </div>
         </div>
         <div class="mb-3 form-group">
           <label class="form-label">Country</label>
-          <select id="country" name="country">
+          <select id="country" name="country" aria-label="country">
             <option value="France" value="default" selected>France</option>
             <option value="Belgium">Belgium</option>
             <option value="Germany">Germany</option>
             <option value="Spain">Spain</option>
             <option value="United Kingdom">United Kingdom</option>
+            <option value="Other">Other</option>
           </select>
+          <input type="text" class="form-control" id="other-country" maxlength="16">
         </div>
       </form>
       <button id="bouton" type="submit" class="btn btn-success w-100" onclick="displayQrCode()">Generate the business card</button>

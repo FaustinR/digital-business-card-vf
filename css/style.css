@@ -178,14 +178,7 @@
   .globe-section img{
     width: 15rem; 
     height: auto;
-    border-bottom-right-radius: 15px;
     float: right;
-  }
-
-  @media (max-width: 480px) {
-    .globe-section img{
-      width: 12rem; 
-    }
   }
 
   .summary p,
@@ -237,6 +230,12 @@
     min-width: 250px;
   }
   
+  @media (max-width: 480px) {
+    .globe-section img{
+      width: 12rem; 
+    }
+  }
+
   .globe-section {
     flex: 1 1 40%;
     min-width: 200px;
@@ -284,7 +283,7 @@
   }
 
 #phone-section {
-    display: none;
+  display: none;
 }
 
 #display-adress {
@@ -309,6 +308,10 @@
   display: none;
 }
 
-#custom-street, #custom-code, #custom-city{
+#custom-street, #custom-code, #custom-city, #additional-street{
   height: fit-content;
+}
+
+#other-country {
+  display: none;
 }
