@@ -324,18 +324,3 @@
 .form-group {
   margin-bottom: 0.7rem;
 }
-
-#right-box {
-  width: 50%;
-  height: auto; /* Default height behavior */
-  /* position: relative;
-  float: right; */
-}
-
-/* Make it full width on smaller screens */
-@media (max-width: 600px) {
-  #right-box {
-    width: 100%;
-    height: fit-content;
-  }
-}
