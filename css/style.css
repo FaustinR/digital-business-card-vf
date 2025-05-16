@@ -328,8 +328,8 @@
 #right-box {
   width: 50%;
   height: auto; /* Default height behavior */
-  position: relative;
-  float: right;
+  /* position: relative;
+  float: right; */
 }
 
 /* Make it full width on smaller screens */
