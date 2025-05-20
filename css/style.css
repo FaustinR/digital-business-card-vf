@@ -296,7 +296,7 @@
   line-height: 1.5;
 }
 
-#email-error {
+#email-error , #city-error {
   color: red;
   font-size: 14px;
   display: none;

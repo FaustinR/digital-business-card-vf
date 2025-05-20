@@ -12,7 +12,7 @@ var inputs = ['first-name', 'last-name','role', 'phone', 'email', 'address', 'co
 const newInputs = ['custom-street', 'additional-street', 'custom-code', 'custom-city'];
 var otherAddress = false;
 var otherCountry = false;
-
+const codeCity = document.getElementById("custom-code").value;
 
 /**
  * Liste des adresses des sites de Bezons, Aix et Echirolles 
@@ -348,6 +348,8 @@ function getAddress(){
     const addressName = document.getElementById('address').value.trim();
 
     const address = addresses.find(add => add.name === addressName)
+    const codeCity = document.getElementById("custom-code").value;
+    const codeAndCity = document.getElementById('custom-code').value.trim().split(",");
 
     let addressJson = {}
     otherAddress = true ? document.getElementById('address').value === 'Other' : false;
@@ -355,10 +357,10 @@ function getAddress(){
       document.getElementById('custom-address').style.display = 'block';
       addressJson.street = document.getElementById('custom-street').value.trim() + '<br>'; // Contains the name and the street number
       addressJson.addStreet = '<br>'+ document.getElementById('additional-street').value.trim() + '<br>';
-      // add the additional street infos with the id=additional-street if not empty
-      addressJson.code = document.getElementById('custom-code').value.trim() + '<br>'; //Contains the postal code and the city 
-      // add the additional city infos with the id=custom-city if not empty
-      addressJson.city = document.getElementById('custom-city').value.trim();
+      
+      addressJson.code = isValidPostalCodeCityFormat(codeCity) ? codeAndCity[0] + '<br>' : '';
+      addressJson.city = isValidPostalCodeCityFormat(codeCity) ? codeAndCity[1] : '';
+
       return addressJson
     }else{
       if(addressName !== 'Echirolles' && !otherAddress){
@@ -377,6 +379,8 @@ function getAddress(){
 function displayQrCode(){
     emptyField = checkEmptyFields();
     const emailInput = document.getElementById("email");
+    const codeCity = document.getElementById("custom-code").value;
+
     const notifClass = emptyField !== '' ? 'error' : 'success';
     let message;
     if(emptyField !== ''){
@@ -388,6 +392,16 @@ function displayQrCode(){
       setTimeout(function() {
         errorSpan.style.display = "none";
       }, 5000);
+    }else if(otherAddress && !isValidPostalCodeCityFormat(codeCity)){
+      const errorCode = document.getElementById("city-error");
+      errorCode.textContent = "Invalid format. Use: 'PostalCode,City. Minimum length for each is 3'";
+      errorCode.className = "invalid";
+      errorCode.style.display = "inline";
+      document.getElementById('qrcode').style.display = "none";
+      document.getElementById('download-qr-code').style.display = "none";
+      setTimeout(function() {
+        errorCode.style.display = "none";
+      }, 10000);
     }else{
         let name = document.getElementById('first-name').value.trim()
 
@@ -503,6 +517,13 @@ function getCountry() {
   return selectElement.value;
 }
 
+function isValidPostalCodeCityFormat(input) {
+  // Format : code,city et chacun doit avoir une longueur d'au moins 3
+  const regex = /^\d{3,},.{3,}$/; 
+  return regex.test(input);
+}
+
+
 
 window.onload = ()=>{
   updateSummaryAndQRCode();
@@ -510,6 +531,23 @@ window.onload = ()=>{
 
   const emailInput = document.getElementById("email");
   const errorSpan = document.getElementById("email-error");
+  const errorCode = document.getElementById("city-error");
+  const codeCity = document.getElementById("custom-code");
+
+  codeCity.addEventListener("input", () => {
+    const input = codeCity.value;
+  
+    if(!isValidPostalCodeCityFormat(input)){
+      errorCode.textContent = "Invalid format. Use: 'PostalCode,City. Minimum length for each is 3'";
+      errorCode.className = "invalid";
+      errorCode.style.display = "inline";
+    }else{
+      errorCode.style.display = "none";
+    };
+    setTimeout(function() {
+      errorCode.style.display = "none";
+    }, 10000);
+  });
 
   emailInput.addEventListener("blur", function () {
     if (!isValidEmail(emailInput.value)) {
