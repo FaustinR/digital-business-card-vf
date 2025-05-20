@@ -41,8 +41,16 @@
         </div>
         <div class="form-group">
           <label class="form-label">Phone number</label>
+          <select id="country-code" name="country-code" aria-label="country-code">
+            <option value="+33" selected>+33</option>
+            <option value="+32">+32</option>
+            <option value="+49">+49</option>
+            <option value="+34">+34</option>
+            <option value="+44">+44</option>
+            <option value="Other" >Other</option>
+          </select>
           <input type="text" class="form-control" id="phone" placeholder="ex : +33 7......" style="height: fit-content;" pattern="\d{9}" 
-            maxlength="12" inputmode="numeric" value="+33">
+            maxlength="12" inputmode="numeric">
         </div>
         <div class="form-group">
           <label class="form-label add-red-star">Email</label>

@@ -12,7 +12,9 @@ var inputs = ['first-name', 'last-name','role', 'phone', 'email', 'address', 'co
 const newInputs = ['custom-street', 'additional-street', 'custom-code', 'custom-city'];
 var otherAddress = false;
 var otherCountry = false;
+var otherPhone = false;
 const codeCity = document.getElementById("custom-code").value;
+let prefix = document.getElementById('country-code').value;
 
 /**
  * Liste des adresses des sites de Bezons, Aix et Echirolles 
@@ -92,6 +94,9 @@ function getFormData() {
     const data = {};
     inputs.forEach(id => {
       data[id] = document.getElementById(id).value.trim();
+      if(id === 'phone' && otherPhone){
+        prefix = '+';
+      }
     });
     
     const address = getAddress();
@@ -100,6 +105,7 @@ function getFormData() {
     data.addStreet = data['additional-street'];
     data.code = address.code;
     data.city = address.city
+    data.customCity = address.customCity
     data.country = !otherCountry ? getCountry() : document.getElementById('other-country').value.trim();
     data.company = companyName;
     return data;
@@ -119,6 +125,14 @@ function getFormData() {
     if(!otherAddress){
       document.getElementById('country').value = 'France';
     }
+    
+    const selectElem = document.getElementById("country-code");
+
+    selectElem.addEventListener('change', () => {
+      prefix = selectElem.value;
+      document.getElementById('phone').value = selectElem.value !== 'Other' ? prefix : '+';
+      otherPhone = selectElem.value === 'Other' ? true : false;
+    });
 
     const data = getFormData();
     displayNewCountry();
@@ -126,7 +140,8 @@ function getFormData() {
       data.street,
       otherAddress ? data.addStreet+ '<br>' : '',
       data.code,
-      data.city
+      data.city,
+      otherAddress ? data.customCity + '<br>' : ''
     ].filter(str => str !== "").join('\n');
     
     inputs.forEach(id => {
@@ -138,7 +153,7 @@ function getFormData() {
         document.getElementById('display-country').textContent = document.getElementById(id).value.trim();
       }else if(id === 'phone'){
         // On affiche l'icône(combiné d'un téléphone) seulement si le numéro de téléphone est renseigné
-        data[id].length > 3 ? document.getElementById('phone-section').style.display = 'block' : document.getElementById('phone-section').style.display = 'none';
+        data[id].length > 1 ? document.getElementById('phone-section').style.display = 'block' : document.getElementById('phone-section').style.display = 'none';
         //On récupére les 9 derniers chiffres du numéro de téléphone et dans la carte de visite on les affiche au format +33 6 06 06 06 06
         // Avec une éspace après tous les 2 chiffres
         const lastDigits = data[id].slice(3).replace(/\D/g, "").slice(0, 9);
@@ -149,7 +164,11 @@ function getFormData() {
             formatted += ' ';
           }
         }
-        document.getElementById('display-phone').textContent = "+33 "+ formatted;
+        if(otherPhone){
+          document.getElementById('display-phone').textContent = data[id]
+        }else{
+          document.getElementById('display-phone').textContent = prefix+" "+ formatted;
+        }
       }else{
           try {
             if(!newInputs.includes(id)){
@@ -201,7 +220,7 @@ newInputs.forEach(id => {
     document.getElementById(id).addEventListener('input', updateSummaryAndQRCode);
 });
 
-['other-country', 'country'].forEach(id => {
+['other-country', 'country', 'country-code'].forEach(id => {
     document.getElementById(id).addEventListener('input', updateSummaryAndQRCode);
 });
 
@@ -360,6 +379,7 @@ function getAddress(){
       
       addressJson.code = isValidPostalCodeCityFormat(codeCity) ? codeAndCity[0] + '<br>' : '';
       addressJson.city = isValidPostalCodeCityFormat(codeCity) ? codeAndCity[1] : '';
+      addressJson.customCity = document.getElementById('custom-city').value.trim();
 
       return addressJson
     }else{
@@ -564,8 +584,9 @@ window.onload = ()=>{
 
 
   const phoneInput = document.getElementById('phone');
-  const prefix = '+33';
 
+  document.getElementById('phone').value = prefix;
+  
   phoneInput.addEventListener('input', () => {
     if (!phoneInput.value.startsWith(prefix)) {
       phoneInput.value = prefix;
@@ -595,6 +616,7 @@ window.onload = ()=>{
       phoneInput.setSelectionRange(prefix.length, prefix.length);
     }
   });
+  
 
   window.addEventListener("DOMContentLoaded", formatAddress);
   window.addEventListener("resize", formatAddress);
