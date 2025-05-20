@@ -14,7 +14,7 @@ var otherAddress = false;
 var otherCountry = false;
 var otherPhone = false;
 const codeCity = document.getElementById("custom-code").value;
-let prefix = document.getElementById('country-code').value;
+let prefix = '';
 
 /**
  * Liste des adresses des sites de Bezons, Aix et Echirolles 
@@ -129,11 +129,14 @@ function getFormData() {
     const selectElem = document.getElementById("country-code");
 
     selectElem.addEventListener('change', () => {
-      prefix = selectElem.value;
-      document.getElementById('phone').value = selectElem.value !== 'Other' ? prefix : '+';
+      prefix = selectElem.value === 'Other' ? '+' : '';
+      document.getElementById('phone').value = prefix;
       otherPhone = selectElem.value === 'Other' ? true : false;
     });
-
+    
+    let phoneField = document.getElementById("phone");
+    phoneField.maxLength = !otherPhone ? 10 : 14;
+    
     const data = getFormData();
     displayNewCountry();
     const addressToDisplay = [
@@ -153,10 +156,10 @@ function getFormData() {
         document.getElementById('display-country').textContent = document.getElementById(id).value.trim();
       }else if(id === 'phone'){
         // On affiche l'icône(combiné d'un téléphone) seulement si le numéro de téléphone est renseigné
-        data[id].length > 1 ? document.getElementById('phone-section').style.display = 'block' : document.getElementById('phone-section').style.display = 'none';
+        data[id].length >= 1 ? document.getElementById('phone-section').style.display = 'block' : document.getElementById('phone-section').style.display = 'none';
         //On récupére les 9 derniers chiffres du numéro de téléphone et dans la carte de visite on les affiche au format +33 6 06 06 06 06
         // Avec une éspace après tous les 2 chiffres
-        const lastDigits = data[id].slice(3).replace(/\D/g, "").slice(0, 9);
+        const lastDigits = data[id].replace(/\D/g, "");
         let formatted = "";
         for (let i = 0; i < lastDigits.length; i++) {
           formatted += lastDigits[i];
@@ -167,7 +170,8 @@ function getFormData() {
         if(otherPhone){
           document.getElementById('display-phone').textContent = data[id]
         }else{
-          document.getElementById('display-phone').textContent = prefix+" "+ formatted;
+          const countryCode = document.getElementById('country-code').value.trim();
+          document.getElementById('display-phone').textContent = countryCode+" "+ formatted;
         }
       }else{
           try {
