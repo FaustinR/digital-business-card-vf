@@ -42,6 +42,16 @@ const addresses = [
     }
 ]
 
+const countryCodes = [
+  {"+33" : 9}, // France
+  {"+32" : 8}, // Belgium
+  {"+44" : 10}, // UK
+  {"+49" : 10}, //Germany
+  {"+34" : 8}, // Spain
+  {"Other" : 13} // Other
+]
+
+
 /**
  * summaryMap Crée une liaison entre les champs du formulaire et les champs de la carte de visite, 
  * summaryMap permet de mettre à jour les informations de la carte en temps réel
@@ -111,6 +121,12 @@ function getFormData() {
     return data;
   }
 
+  function getCountryCodeLength(code) {
+    const entry = countryCodes.find(obj => Object.keys(obj)[0] === code);
+  return entry ? entry[code] : null;
+}
+
+
  /**
  * La fonction updateSummaryAndQRCode permet de mettre à jour les informations dans la carte de visite en temps réel.
  * @returns rien
@@ -134,8 +150,9 @@ function getFormData() {
       otherPhone = selectElem.value === 'Other' ? true : false;
     });
     
+    const maxLength = getCountryCodeLength(document.getElementById("country-code").value.trim())
     let phoneField = document.getElementById("phone");
-    phoneField.maxLength = !otherPhone ? 10 : 14;
+    phoneField.maxLength = maxLength;
     
     const data = getFormData();
     displayNewCountry();
@@ -193,7 +210,8 @@ function getFormData() {
     }
     
     customizeJobTitle();
-    const phoneNber = data.phone.length >= 10 ? data.phone : '';
+    let codeAndOrPhone = !otherPhone ? document.getElementById("country-code").value.trim() + data.phone : data.phone
+    const phoneNber = data.phone.length >= 9 ? codeAndOrPhone : '';
     const vcard = 
   `BEGIN:VCARD\r\n` +
   `VERSION:3.0\r\n` +
@@ -263,7 +281,9 @@ document.getElementById("download-qr-code").addEventListener("click", async () =
     
     const addCity = data.city === 'Echirolles' || otherAddress ? qpEncodeStr(data.city) : qpEncodeStr(sanitizeInput(data.city))
 
-    const phoneNber = data.phone.length >= 10 ? data.phone : '';
+    let codeAndOrPhone = !otherPhone ? document.getElementById("country-code").value.trim() + data.phone : data.phone
+    const phoneNber = data.phone.length >= 9 ? codeAndOrPhone : '';
+
     //Création du contenu du fichier contact.vcf
     const lines = [
       "BEGIN:VCARD",
