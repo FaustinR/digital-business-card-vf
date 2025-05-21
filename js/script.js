@@ -312,8 +312,8 @@ document.getElementById("download-qr-code").addEventListener("click", async () =
       "EMAIL:" + qpEncodeStr(email),
       "URL:" + qpEncodeStr(website),
       "URL:" + qpEncodeStr(linkedin),
-      "ADR;CHARSET=UTF-8;TYPE=WORK:;;;;;" + postalCode + ";" + country,
-      "LABEL;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE;TYPE=WORK:" + qpEncodeStr(`${street}\\n${postalCode}\\n${city}\\n${country}`),
+      "ADR;CHARSET=UTF-8;TYPE=WORK:;;;;;" + postalCode + ";" + data.country,
+      "LABEL;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE;TYPE=WORK:" + qpEncodeStr(`${street}\\n${postalCode}\\n${city}\\n${data.country}`),
 
       "END:VCARD"
     ];
