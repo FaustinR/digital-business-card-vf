@@ -136,6 +136,13 @@
     width: fit-content;
   }
 
+  @media (max-width: 600px) {
+    #country-code {
+      margin-left: 2.5rem; /* override on small devices */
+    }
+  }
+
+  
   #bouton {
     background-color:  #084063;
   }
