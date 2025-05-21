@@ -159,8 +159,8 @@ function getFormData() {
     const addressToDisplay = [
       data.street,
       otherAddress ? data.addStreet+ '<br>' : '',
-      data.code,
-      data.city,
+      otherAddress ? data.code.replace("<br>", "") + ' ' + data.city + '<br>' : data.code,
+      !otherAddress ? data.city : '',
       otherAddress ? data.customCity + '<br>' : ''
     ].filter(str => str !== "").join('\n');
     
@@ -279,31 +279,43 @@ document.getElementById("download-qr-code").addEventListener("click", async () =
         '=' + c.charCodeAt(0).toString(16).toUpperCase().padStart(2, '0')
     );
     
-    const addCity = data.city === 'Echirolles' || otherAddress ? qpEncodeStr(data.city) : qpEncodeStr(sanitizeInput(data.city))
-
     let codeAndOrPhone = !otherPhone ? document.getElementById("country-code").value.trim() + data.phone : data.phone
     const phoneNber = data.phone.length >= 9 ? codeAndOrPhone : '';
+    
+    const firstName = data['first-name'];
+    const lastName = data['last-name'];
+    const company = data.company;
+    const role = data.role;
+    const email = data.email;
+    let street = data.street.replace("<br>", ""); 
+    let city = data.city.replace("<br>", "");
+    const postalCode = data.code.replace("<br>", "");
+
+    if (data.addStreet && data.addStreet.trim() !== "") {
+      street += ", " + data.addStreet.trimStart();
+    }
+
+    let additionalCityInfo = data.customCity?.trimStart();
+    if (additionalCityInfo && additionalCityInfo !== "") {
+      city += ", " + additionalCityInfo || "";
+    }
 
     //Création du contenu du fichier contact.vcf
-    const lines = [
+    const lines = [    
       "BEGIN:VCARD",
       "VERSION:3.0",
-      "N;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:" + qpEncodeStr(data['last-name']) + ";" + qpEncodeStr(data['first-name']) + ";;;",
-      "FN;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:" + qpEncodeStr(`${data['first-name']} ${data['last-name']}`),
-      "ORG;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:" + qpEncodeStr(data.company),
-      "TITLE;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:" + qpEncodeStr(data.role),
+      "N;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:" + qpEncodeStr(lastName) + ";" + qpEncodeStr(firstName) + ";;;",
+      "FN;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:" + qpEncodeStr(`${firstName} ${lastName}`),
+      "ORG;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:" + qpEncodeStr(company),
+      "TITLE;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:" + qpEncodeStr(role),
       "TEL;TYPE=CELL,VOICE:" + phoneNber,
-      "EMAIL:" + qpEncodeStr(data.email),
+      "EMAIL:" + qpEncodeStr(email),
       "URL:" + qpEncodeStr(website),
       "URL:" + qpEncodeStr(linkedin),
+      "ADR;CHARSET=UTF-8;TYPE=WORK:;;;;;" + postalCode + ";" + country,
+      "LABEL;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE;TYPE=WORK:" + qpEncodeStr(`${street}\\n${postalCode}\\n${city}\\n${country}`),
 
-      "ADR;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE;TYPE=WORK:;" +
-      ";" + 
-      qpEncodeStr(data.street.replace("<br>", "")) + ";" +    
-      data.code.replace("<br>", "") + ";" +      
-      ";;" + 
-      addCity + ";" +
-      "France",
+      "END:VCARD"
     ];
     
     const vcardText = lines.join("\r\n") + "\r\n";
@@ -402,7 +414,7 @@ function getAddress(){
       addressJson.addStreet = '<br>'+ document.getElementById('additional-street').value.trim() + '<br>';
       
       addressJson.code = isValidPostalCodeCityFormat(codeCity) ? codeAndCity[0] + '<br>' : '';
-      addressJson.city = isValidPostalCodeCityFormat(codeCity) ? codeAndCity[1] : '';
+      addressJson.city = isValidPostalCodeCityFormat(codeCity) ? codeAndCity[1].trimStart() : '';
       addressJson.customCity = document.getElementById('custom-city').value.trim();
 
       return addressJson
