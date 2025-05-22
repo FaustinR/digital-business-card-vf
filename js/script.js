@@ -42,6 +42,12 @@ const addresses = [
     }
 ]
 
+/**
+ * Liste des codes des pays et la taille maximale du numéro de téléphone mobile sans compte le code 
+ * Cette liste permet l'utilisateur de ne pas saisir trop des chiffres en fonction du code du pays 
+ * qu'il a choisi dans la liste déroulante
+ */
+
 const countryCodes = [
   {"+33" : 9}, // France
   {"+32" : 8}, // Belgium
@@ -271,13 +277,6 @@ document.getElementById("download-qr-code").addEventListener("click", async () =
         })
         .join('');
     };
-
-    const sanitizeInput = (str) => 
-      str
-      .replace(/[<br>\r\n]/g, '')
-      .replace(/[^!-<>@-~ ]/g, c =>
-        '=' + c.charCodeAt(0).toString(16).toUpperCase().padStart(2, '0')
-    );
     
     let codeAndOrPhone = !otherPhone ? document.getElementById("country-code").value.trim() + data.phone : data.phone
     const phoneNber = data.phone.length >= 9 ? codeAndOrPhone : '';
@@ -395,7 +394,8 @@ function notify(emptyField, fieldClass, message){
 
 /**
  * Cette fonction de récupèrer l'adresse copmlète au format JSON en fonction de nom du site choisi dans la liste déroulante 
- * contenant les sites(Aix-en-provence, Bezons et Echirolles)
+ * contenant les sites(Aix-en-provence, Bezons et Echirolles) et si il choisi Other dans la liste, les champs inputs sont affichés 
+ * ce qui lui permet de renseigner son adresse manuellement
 * @returns {addressJson} Un objet JSON contenant la rue, la ville et le code postal du site séléctionné
 */
 
@@ -549,6 +549,12 @@ document.getElementById("address").addEventListener("change", function () {
   }
 })
 
+/**
+  * Cette fonction permet d'affiche le pays sélectionné dans la liste et permet l'utilisateur de 
+  * renseigner un autre pays s'il n'est présent dans la liste 
+  * @returns rien
+*/
+
 function displayNewCountry() {
   const name = getCountry();
   if(name === 'Other'){
@@ -573,8 +579,14 @@ function getCountry() {
   return selectElement.value;
 }
 
+/**
+  * Cette fonction permet de valider le format du code postal et ville renseigner manuellement par l'utilisateur
+  * Condition : code postal ,ville chacun doit avoir une longueur d'au moins 3
+  * C'est à dire au moins 3 chiffres pour le code postal et au moins 3 caractères pour le nom de la ville
+  * @param {input} - Le code postal et ville renseigné par l'utilisateur
+  * @returns true si le format est correct si non false
+*/
 function isValidPostalCodeCityFormat(input) {
-  // Format : code,city et chacun doit avoir une longueur d'au moins 3
   const regex = /^\d{3,},.{3,}$/; 
   return regex.test(input);
 }
@@ -617,7 +629,6 @@ window.onload = ()=>{
   }, 5000);
 
   });
-
 
   const phoneInput = document.getElementById('phone');
 
