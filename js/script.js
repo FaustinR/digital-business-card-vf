@@ -26,12 +26,12 @@ const addresses = [
       name : "Aix",
       street : "665 avenue Galiléee",
       PostalCode: "\nBP 20140",
-      city: "\n13799 Aix-en-Provence Cedex 03"
+      city: "\n13799 Aix-en-Provence"
     },
     {
       name : "Bezons",
       street : "80 quai Voltaire",
-      PostalCode: "\nRiver Ouest - Campus ATOS",
+      PostalCode: "\nRiver Ouest - Indian Building - 2nd floor",
       city: "\n95877 Bezons Cedex"
     },
     {
@@ -162,21 +162,34 @@ function getFormData() {
     
     const data = getFormData();
     displayNewCountry();
-    const addressToDisplay = [
-      data.street,
-      otherAddress ? data.addStreet+ '<br>' : '',
-      otherAddress ? data.code.replace("<br>", "") + ' ' + data.city + '<br>' : data.code,
-      !otherAddress ? data.city : '',
-      otherAddress ? data.customCity + '<br>' : ''
-    ].filter(str => str !== "").join('\n');
+    
+    let addressToDisplay = [];
+    
+    var addCountry = otherCountry ? document.getElementById('other-country').value : getCountry();
+    let isBezons = document.getElementById('address').value.trim() === 'Bezons';
+    
+    if(!isBezons){
+      addressToDisplay = [
+        data.street,
+        otherAddress ? data.addStreet+ '<br>' : '',
+        otherAddress ? data.code.replace("<br>", "") + ' ' + data.city + '<br>' : data.code,
+        !otherAddress ? data.city : '',
+        otherAddress ? data.customCity + '<br>' : ''
+      ].filter(str => str !== "").join('\n');
+    }else{
+      addressToDisplay = [
+        data.code.replace("<br>", "") + '<br>',
+        data.street,
+        data.city
+      ].filter(str => str !== "").join('\n');
+    };
     
     inputs.forEach(id => {
       if(['first-name', 'last-name'].includes(id)){
         document.getElementById('display-names').textContent = firstName || lastName ? `${firstName.replace(/[0-9]/g, '')} ${lastName.replace(/[0-9]/g, '')}` : ''
       }else if(id === 'address'){
-        document.getElementById('display-adress').innerHTML = addressToDisplay;
-      }else if(id === 'other-country'){
-        document.getElementById('display-country').textContent = document.getElementById(id).value.trim();
+        document.getElementById('display-adress').innerHTML = !otherAddress ? addressToDisplay + " - " + addCountry : addressToDisplay + addCountry;
+        document.getElementById('display-country').style.display = 'none';
       }else if(id === 'phone'){
         // On affiche l'icône(combiné d'un téléphone) seulement si le numéro de téléphone est renseigné
         data[id].length >= 1 ? document.getElementById('phone-section').style.display = 'block' : document.getElementById('phone-section').style.display = 'none';
@@ -514,10 +527,24 @@ function customizeJobTitle(maxLength = 21) {
 function formatAddress() {
   const addressField = document.getElementById("display-adress");
   let address = addressField.innerHTML;
+
   let lines = address.split(/<br\s*\/?>/gi).map(line => line.trim());
+
   if (window.innerWidth <= 480) {
-    lines = lines.map(line => {
-      return line.includes("Cedex") ? line.replace(/(.*)(\sCedex\s?\d*)/, "$1<br>$2") : line;
+    lines = lines.flatMap(line => {
+      // On récupére le nom du pays qui se trouve à la fin de l'adresse
+      const match = line.match(/\s+-\s+([A-Za-zÀ-ÿ\s]+)$/);
+      if (match) {
+        const country = match[1].trim();
+        const beforeCountry = line.replace(match[0], "").trim();
+        return [beforeCountry, country];
+      }
+      // Ajout d'un saut de line devant "2nd floor" pour les petits écrans
+      if (line.includes("- 2nd floor")) {
+        const parts = line.split("- 2nd floor");
+        return [parts[0].trim(), "2nd floor"];
+      }
+      return [line];
     });
   } else {
     lines = lines.map(line => line.replace(/<br\s*\/?>/gi, '').trim());
